@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-image = cv2.imread("../input/test_image.jpg")
+image = cv2.imread("../input/test_image_1.jpg")
 
 
 canny = cv2.Canny(image, 130, 250)
@@ -10,11 +10,11 @@ contours, hierarchy = cv2.findContours(canny, cv2.RETR_TREE, cv2.CHAIN_APPROX_SI
 
 for cnt in contours:
     # Sadece en büyük konturu ayıklıyoruz
-    if cv2.contourArea(cnt) > 2000:
+    if cv2.contourArea(cnt) >  70:
         # Konturları çiziyoruz
         cv2.drawContours(image, [cnt], 0, (0, 0, 255), 2)
 
-cv2.imwrite("../output/test_output.jpg", image)
+cv2.imwrite("../output/test_output_1.jpg", image)
 
 
 """
