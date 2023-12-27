@@ -4,7 +4,7 @@ import numpy as np
 def anything(a):
     pass
 
-pth = '/Users/muhammedemincaglar/Documents/GitHub/RobotRecognizer/Konsol2/input/7.jpg'
+pth = '/Users/muhammedemincaglar/Documents/GitHub/RobotRecognizer/Konsol2/input/1.jpg'
 img = cv2.imread(pth)
 height, width, _ = img.shape
 
