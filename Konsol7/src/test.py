@@ -1,6 +1,7 @@
 import unittest
 import cv2
 import numpy as np
+import subprocess
 
 
 def get_color_from_file(number):
@@ -56,6 +57,11 @@ class TestImageProcessing(unittest.TestCase):
         image = cv2.imread(image_path)
         self.assertIsNotNone(image)
 
+    def test_non_existing_image_loading(self):
+        image_path = "not-a-real-path"
+        image = cv2.imread(image_path)
+        self.assertIsNone(image)
+
     def test_image_resizing(self):
         image_path = f'Konsol7/input/22.jpg'
         image = cv2.imread(image_path)
@@ -106,42 +112,15 @@ class TestImageProcessing(unittest.TestCase):
 
     def test_output_image_saving(self):
 
-        image_org = cv2.imread(f'Konsol7/input/22.jpg')
+        subprocess.run("python Konsol7\src\main.py 300 1125000 0.40", shell=True, check=True)
+       
+        for i in range(108):
 
-        image_org = cv2.resize(image_org, (600, 451))
+            if i == 15:
+                continue
 
-        image = cv2.cvtColor(image_org, cv2.COLOR_BGR2HSV)
-
-        image = cv2.GaussianBlur(image, (9, 9), 0)
-
-
-        color_range = get_color_from_file(22)
-
-        image = cv2.inRange(image, color_range[0], color_range[1])
-        image = cv2.bitwise_not(image)
-
-        image = cv2.dilate(image, (21, 21), iterations=4)
-
-        params = cv2.SimpleBlobDetector_Params()
-
-        params.filterByArea = True
-        params.minArea = 100
-        params.maxArea = 1000000
-
-
-        detector = cv2.SimpleBlobDetector_create(params)
-
-        keypoints = detector.detect(image)
-
-        image_keypoints = np.zeros_like(image_org)
-        image_keypoints = cv2.drawKeypoints(image, keypoints, image_keypoints, (0, 0, 255),
-                                        cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-
-        cv2.imwrite(f'Konsol7/output/22.jpg', image_keypoints)
-
-        saved_image = cv2.imread(f'Konsol7/output/22.jpg')
-        self.assertIsNotNone(saved_image)
+            saved_image = cv2.imread(f'Konsol7/output/{i+1}.jpg')
+            self.assertIsNotNone(saved_image)
 
 
 if __name__ == '__main__':
