@@ -1,5 +1,10 @@
 import cv2
 import numpy as np
+import sys
+
+if len(sys.argv) != 4:
+    print("Usage is: python main.py <minArea> <maxArea> <minCircularity>")
+    sys.exit(1)
 
 def get_color_from_file(number):
     if(number >= 1 and number <= 2):
@@ -75,11 +80,11 @@ for i in range(108):
     # params.minThreshold = 10
     # params.maxThreshold = 255
     params.filterByArea = True
-    params.minArea = 100
-    params.maxArea = 1000000
+    params.minArea = int(sys.argv[1])
+    params.maxArea = int(sys.argv[2])
 
-    #params.filterByCircularity = True
-    #params.minCircularity = 0.40
+    params.filterByCircularity = True
+    params.minCircularity = float(sys.argv[3])
 
 
     detector = cv2.SimpleBlobDetector_create(params)

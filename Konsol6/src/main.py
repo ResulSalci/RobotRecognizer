@@ -1,5 +1,12 @@
 import cv2
 import numpy as np
+import sys
+
+# minArea = 300, maxArea = 1125000, minCircularity = 0.40
+if len(sys.argv) != 4:
+    print("Usage is: python main.py <minArea> <maxArea> <minCircularity>")
+    sys.exit(1)
+
 for i in range(32):
     image_org = cv2.imread(f'Konsol6/input/{i+1}.jpg', cv2.IMREAD_GRAYSCALE)
 
@@ -24,10 +31,10 @@ for i in range(32):
     #params.minThreshold = 10
     #params.maxThreshold = 255
     params.filterByArea = True
-    params.minArea = 300
-    params.maxArea = 1125000
+    params.minArea = int(sys.argv[1])
+    params.maxArea = int(sys.argv[2])
     params.filterByCircularity = True
-    params.minCircularity = 0.40
+    params.minCircularity = float(sys.argv[3])
 
     detector = cv2.SimpleBlobDetector_create(params)
 
