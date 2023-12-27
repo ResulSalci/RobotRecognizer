@@ -1,0 +1,23 @@
+uygulamada iki adet fonksiyon vardır:
+
+1 detect_contours(image): resmi alır,resmi grileştirir, Gaussianblur yöntemiyle resim bulanıklaştırılır, edges de kenarları tespit edilmeye çalışılır, en son kontürler bulunup bir  list formatında döndürür.
+
+2 main (): resimlerin alınacağı ve yazılacağı klasörler belirlenir, inputtaki resimler tek tek alınır, detect_contours() metoduyla conturlar alınır ve draw_countours ile contourler yeşil renkle çizilir. en son output klasörüne yazılır.
+
+bu uygulamada gaussianblur ve cv2.canny fonksiyonularının parametreleriyle oynanmıştır.
+
+GaussianBlur() -  cv2.Canny() - DoğruRobotSayisi - DoğruResimSayisi
+(15, 15), 0        35, 130         54                    28
+(15, 15), 1        35, 130         53                    29
+(17, 13), 0        40, 130         55                    30
+(17, 15), 0        40, 130         53                    28
+(17, 17), 0        40, 130         50                    25
+(19, 19), 0        40, 130         39                    17
+
+- GaussianBlur da 0 olan parametreti 0 dışı bir pozitif parametre yaptıgımda resimleri mermerler dahil bütün kontürleri tespit etti ve çizdi.
+
+- 20.jpg çok bulanık oldugundan inputtan kaldırıldı.
+
+- Blur daki parametreler arttıkça çalışma süresi uzamaya başladı. bununla beraber yukarıdaki sayılardan arttırdıkça tespit edilen mermerlerin sayısnın azlamasıyla beraber tespit edilen robotlarda tam tespit edilememeye başladı.
+
+- Canny de 2. parametreyi arttırdıkça tespit edilen mermerlein sayısı azaldı. ilk parametre, bazı tam tespit edilemeyen robotlar için düşük tutuldu.

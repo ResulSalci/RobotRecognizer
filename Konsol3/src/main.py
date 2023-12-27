@@ -1,58 +1,22 @@
 import cv2
-import numpy as np
+import os
 
-image = cv2.imread("../input/test_image_1.jpg")
+def detect_contours(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (19, 19), 0)
+    edges = cv2.Canny(blurred, 40, 130)
+    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    return contours
 
+def main():
+    input_folder = "../input"
+    output_folder = "../output"
+    for image_file in os.listdir(input_folder):
+        image = cv2.imread(os.path.join(input_folder, image_file))
+        detected_contours = detect_contours(image)
+        for contour in detected_contours:
+            cv2.drawContours(image, [contour], -1, (0,255, 0), 7)
+        cv2.imwrite(os.path.join(output_folder, image_file), image)
 
-canny = cv2.Canny(image, 130, 250)
-
-contours, hierarchy = cv2.findContours(canny, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-for cnt in contours:
-    # Sadece en büyük konturu ayıklıyoruz
-    if cv2.contourArea(cnt) >  70:
-        # Konturları çiziyoruz
-        cv2.drawContours(image, [cnt], 0, (0, 0, 255), 2)
-
-cv2.imwrite("../output/test_output_1.jpg", image)
-
-
-"""
-
-import cv2
-
-image = cv2.imread("../input/test_image.jpg")
-
-img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-# apply binary thresholding
-ret, thresh = cv2.threshold(img_gray, 150, 255, cv2.THRESH_BINARY)
-
-# detect the contours on the binary image using cv2.CHAIN_APPROX_NONE
-contours, hierarchy = cv2.findContours(image=thresh, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
-
-# draw contours on the original image
-image_copy = image.copy()
-cv2.drawContours(image=image_copy, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=2,
-                 lineType=cv2.LINE_AA)
-
-# see the results
-cv2.imshow('None approximation', image_copy)
-cv2.waitKey(0)
-cv2.imwrite('../output/test_output.jpg', image_copy)
-cv2.destroyAllWindows()
-
-
-
-
-
-
-
-
-
-# visualize the binary image
-cv2.imshow('Binary image', thresh)
-cv2.waitKey(0)
-cv2.imwrite('../output/test_output.jpg', thresh)
-cv2.destroyAllWindows()
-"""
+if __name__ == "__main__":
+    main()
