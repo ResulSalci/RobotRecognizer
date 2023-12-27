@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 for i in range(32):
-    image_org = cv2.imread(f'../input/{i+1}.jpg', cv2.IMREAD_GRAYSCALE)
+    image_org = cv2.imread(f'Konsol6/input/{i+1}.jpg', cv2.IMREAD_GRAYSCALE)
 
     height = image_org.shape[0]
     width = image_org.shape[1]
@@ -39,7 +39,7 @@ for i in range(32):
     blobs_only_image = np.zeros_like(image_org)
     blobs_only_image = cv2.drawKeypoints(blobs_only_image, keypoints, blobs_only_image, (255, 255, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-    cv2.imwrite(f"../output/{i+1}_output.jpg", image_keypoints)
+    cv2.imwrite(f"Konsol6/output/{i+1}.jpg", image_keypoints)
 
     """
     for kp in keypoints:
