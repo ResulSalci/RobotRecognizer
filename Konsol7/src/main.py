@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 import sys
 
-if len(sys.argv) != 4:
-    print("Usage is: python main.py <minArea> <maxArea> <minCircularity>")
+if len(sys.argv) != 3:
+    print("Usage is: python main.py <minArea> <maxArea>")
     sys.exit(1)
 
 def get_color_from_file(number):
@@ -50,68 +50,49 @@ def get_color_from_file(number):
     else:
         return None
 
+def find_robot(image_org, i, minArea, maxArea):
+    image_org = cv2.resize(image_org, (600, 451))
+
+    image = cv2.cvtColor(image_org, cv2.COLOR_BGR2HSV)
+
+    image = cv2.GaussianBlur(image, (9, 9), 0)
+
+
+    color_range = get_color_from_file(i+1)
+
+    image = cv2.inRange(image, color_range[0], color_range[1])
+    image = cv2.bitwise_not(image)
+
+    params = cv2.SimpleBlobDetector_Params()
+
+    params.filterByArea = True
+    params.minArea = minArea
+    params.maxArea = maxArea
+
+    detector = cv2.SimpleBlobDetector_create(params)
+
+    keypoints = detector.detect(image)
+
+    image_keypoints = np.zeros_like(image_org)
+    image_keypoints = cv2.drawKeypoints(image, keypoints, image_keypoints, (0, 0, 255),
+                                        cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+    blobs_only_image = np.zeros_like(image_org)
+    blobs_only_image = cv2.drawKeypoints(blobs_only_image, keypoints, blobs_only_image, (255, 255, 255),
+                                        cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    
+    return image_keypoints
 #108
-def analyse_images(minArea, maxArea, minCircularity):
+def analyse_images(minArea, maxArea):
     for i in range(108):
 
         if i == 15:
             continue
 
         image_org = cv2.imread(f'Konsol7/input/{i+1}.jpg')
-
-        # (width, height)
-        image_org = cv2.resize(image_org, (600, 451))
-
-        image = cv2.cvtColor(image_org, cv2.COLOR_BGR2HSV)
-
-        image = cv2.GaussianBlur(image, (9, 9), 0)
-        #image = cv2.bitwise_not(image)
-        # 192, 193
-        # image = cv2.threshold(image, 177, 180, cv2.THRESH_BINARY)[1]
-
-        color_range = get_color_from_file(i+1)
-
-        image = cv2.inRange(image, color_range[0], color_range[1])
-        image = cv2.bitwise_not(image)
-        # kernel = np.ones((3, 3), np.uint8)
-        image = cv2.dilate(image, (21, 21), iterations=4)
-        #image = cv2.erode(image, (3,3), iterations=1)
-
-        params = cv2.SimpleBlobDetector_Params()
-        # params.minThreshold = 10
-        # params.maxThreshold = 255
-        params.filterByArea = True
-        params.minArea = minArea
-        params.maxArea = maxArea
-
-        params.filterByCircularity = True
-        params.minCircularity = minCircularity
-
-        detector = cv2.SimpleBlobDetector_create(params)
-
-        keypoints = detector.detect(image)
-
-        image_keypoints = np.zeros_like(image_org)
-        image_keypoints = cv2.drawKeypoints(image, keypoints, image_keypoints, (0, 0, 255),
-                                            cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-        blobs_only_image = np.zeros_like(image_org)
-        blobs_only_image = cv2.drawKeypoints(blobs_only_image, keypoints, blobs_only_image, (255, 255, 255),
-                                            cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        
+        image_keypoints = find_robot(image_org,i, minArea, maxArea)
 
         cv2.imwrite(f"Konsol7/output/{i + 1}.jpg", image_keypoints)
 
-        """
-        for kp in keypoints:
-            x, y = np.int0(kp.pt)
-            cv2.circle(image_keypoints, (x, y), int(kp.size/2), (255, 0, 0), thickness=2)
-            cv2.circle(blobs_only_image, (x, y), int(kp.size/2), (255, 255, 255), thickness=2)
-
-        cv2.imshow("Original Image", image_org)
-        cv2.imshow("Keypoints", image_keypoints)
-        cv2.imshow("Blobs Only", blobs_only_image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        """
-
-analyse_images(int(sys.argv[1]), int(sys.argv[2]), float(sys.argv[3]))
+analyse_images(int(sys.argv[1]), int(sys.argv[2]))
