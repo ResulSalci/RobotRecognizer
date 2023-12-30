@@ -2,11 +2,6 @@ import cv2
 import numpy as np
 import sys
 
-# minArea = 300, maxArea = 1125000, minCircularity = 0.40
-if len(sys.argv) != 4:
-    print("Usage is: python main.py <minArea> <maxArea> <minCircularity>")
-    sys.exit(1)
-
 def find_robot(image_org, minArea, maxArea, minCircularity):
     height = image_org.shape[0]
     width = image_org.shape[1]
@@ -54,5 +49,11 @@ def analyse_images(minArea, maxArea, minCircularity):
 
         cv2.imwrite(f"Konsol6/output/{i+1}.jpg", image_keypoints)
 
+if __name__ == "__main__":
 
-analyse_images(int(sys.argv[1]), int(sys.argv[2]), float(sys.argv[3]))
+    # minArea = 300, maxArea = 1125000, minCircularity = 0.40
+    if len(sys.argv) != 4:
+        print("Usage is: python main.py <minArea> <maxArea> <minCircularity>")
+        sys.exit(1)
+
+    analyse_images(int(sys.argv[1]), int(sys.argv[2]), float(sys.argv[3]))

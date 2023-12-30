@@ -2,9 +2,6 @@ import cv2
 import numpy as np
 import sys
 
-if len(sys.argv) != 3:
-    print("Usage is: python main.py <minArea> <maxArea>")
-    sys.exit(1)
 
 def get_color_from_file(number):
     if(number >= 1 and number <= 2):
@@ -95,4 +92,10 @@ def analyse_images(minArea, maxArea):
 
         cv2.imwrite(f"Konsol7/output/{i + 1}.jpg", image_keypoints)
 
-analyse_images(int(sys.argv[1]), int(sys.argv[2]))
+if __name__ == "__main__":
+
+    if len(sys.argv) != 3:
+        print("Usage is: python main.py <minArea> <maxArea>")
+        sys.exit(1)
+
+    analyse_images(int(sys.argv[1]), int(sys.argv[2]))
