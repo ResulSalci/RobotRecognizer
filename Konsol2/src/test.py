@@ -1,5 +1,6 @@
 import unittest
 import numpy as np
+import cv2
 
 def get_number_from_filename(filename):
     file_number = filename.split('.')[0]
@@ -83,6 +84,60 @@ class TestGetColorFromFileAndGetFileName(unittest.TestCase):
     def test_boundary_filenames(self):
         self.assertEqual(get_number_from_filename("1.doc"), 1)
         self.assertEqual(get_number_from_filename("108.csv"), 108)
+
+    # Countour bulma testi
+    def test_thresholding_and_contour_finding(self):
+        # Test için kullanılacak resmin oluşturulması
+        image = np.zeros((100, 100, 3), dtype=np.uint8)  # 100x100 boyutunda siyah bir resim
+        color = (0, 255, 0)  # Yeşil renk
+        cv2.rectangle(image, (10, 10), (30, 30), color, thickness=cv2.FILLED)  # Yeşil dikdörtgen ekleniyor
+
+        hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        lower_bound = np.array([40, 50, 50]) 
+        upper_bound = np.array([80, 255, 255])
+        thresholded_image = cv2.inRange(hsv_image, lower_bound, upper_bound)
+        contours, _ = cv2.findContours(thresholded_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        expected_contour_count = 1
+        expected_contour_area = 400  # 20x20 boyutundaki yeşil dikdörtgenin alanı
+        self.assertEqual(len(contours), expected_contour_count)
+        self.assertEqual(cv2.contourArea(contours[0]), expected_contour_area)
+
+    def test_robot_detection_and_marking(self):
+        # Test için resim oluşturuyorum
+        image = cv2.imread("/Users/muhammedemincaglar/Documents/GitHub/RobotRecognizer/Konsol2/input/1.jpg")
+        color_range = get_color_from_file(1)
+        hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        color_mask = cv2.inRange(hsv_image, color_range[0], color_range[1])
+        contours, _ = cv2.findContours(color_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        filtered_contours = [cnt for cnt in contours if cv2.contourArea(cnt) > 100]
+
+        # Bulunduğu bütün nesneleri robot diye işaretle
+        for cnt in filtered_contours:
+            cv2.drawContours(image, [cnt], -1, (0, 255, 0), 2)
+
+        # Resmi göster
+        cv2.imshow("Robotlar", image)
+        cv2.waitKey(0)
+    # RGB rengin HSV döndürüp döndürmediğinin kontrolu
+    def test_rgb_to_hsv_conversion(self):
+        rgb_color = np.array([0, 255, 0], dtype=np.uint8)
+        # RGB'den HSV'ye dönüştürme
+        hsv_color = cv2.cvtColor(np.uint8([[rgb_color]]), cv2.COLOR_RGB2HSV)[0][0]
+        # Beklenen HSV renk
+        expected_hsv_color = np.array([60, 255, 255], dtype=np.uint8)
+        error_margin = 1
+        # Her bir kanalın karşılaştırılması
+        for i in range(3):
+            self.assertLessEqual(abs(hsv_color[i] - expected_hsv_color[i]), error_margin)
+    # resize fonksiyonu test
+    def test_image_resize(self):
+        input_image = np.zeros((100, 150, 3), dtype=np.uint8)  # 100x150 boyutunda siyah bir resim
+        resized_image = cv2.resize(input_image, (50, 75))
+        expected_height = 75
+        expected_width = 50
+        actual_height, actual_width, _ = resized_image.shape
+        self.assertEqual(actual_height, expected_height)
+        self.assertEqual(actual_width, expected_width)
 
 if __name__ == '__main__':
     unittest.main()

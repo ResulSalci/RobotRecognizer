@@ -12,7 +12,16 @@ image_files = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.joi
 for image_file in image_files:
     image_path = os.path.join(image_folder, image_file)
     image = cv2.imread(image_path)
-
+    
+    if image is None:
+        print(f"Failed to load image: {image_path}")
+        continue
+    height, width, _ = image.shape
+    # (width, height)
+    if height == 4032:
+        image = cv2.resize(image, (600, 802))
+    else:
+        image = cv2.resize(image, (802, 600))
     #RGB'den HSV'ye dönüştürdüm
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -48,4 +57,4 @@ for image_file in image_files:
     cv2.imwrite(result_image_path, image)
 
 cv2.waitKey(0)
-cv2.destroyAllWindows()
+cv2.destroyAllWindows() 
