@@ -3,3 +3,7 @@ venv
 *.docx
 
 .idea
+
+__pycache__
+
+**/output/*.jpg
