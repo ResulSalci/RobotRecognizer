@@ -32,14 +32,20 @@ def process_image(request):
       minArea = int(request.POST["minArea"])
       maxArea = int(request.POST["maxArea"])
       minCircularity = float(request.POST["minCircularity"])
+      gaussianBlurKernelSize = int(request.POST["gaussianBlurKernelSize"])
+      thresholdMin = int(request.POST["thresholdMin"])
+      thresholdMax = int(request.POST["thresholdMax"])
 
       #Eğer parametrelerde eksik varsa kullanıcıyı home page'e yönlendir.
-      if minArea is None or maxArea is None or minCircularity is None:
+      if minArea is None or maxArea is None or minCircularity is None or gaussianBlurKernelSize is None or thresholdMin is None or thresholdMax is None:
          return redirect("home")
 
+      # Gaussianblur kernel büyüklüğü çift sayı olamaz öyle girildeiyse kullanıcıyı ana sayfaya yönlendir
+      if gaussianBlurKernelSize % 2 == 0:
+         return redirect("home")
 
-      # Maksimum alan minimum alandan küçük gönderilirse işlemi durdur ve kullanıcıyıdan yeniden girdi al
-      if maxArea < minArea:
+      # Maksimum değerler minimumlardan küçük gönderilirse işlemi durdur ve kullanıcıyıdan yeniden girdi al
+      if maxArea < minArea or thresholdMax < thresholdMin:
          return redirect("home")
 
       #Görseli opencv'nin kullanabileceği bir formata getir
@@ -47,7 +53,7 @@ def process_image(request):
 
 
       #Görselde analizi yap ve sonucu değişkene kaydet
-      image_to_encode = find_robot(image_for_cv, minArea, maxArea, minCircularity)
+      image_to_encode = find_robot(image_for_cv, minArea, maxArea, minCircularity, gaussianBlurKernelSize, thresholdMin, thresholdMax)
 
       #Resmi jpg formatına çevir
       _, buffer = cv2.imencode(".jpg", image_to_encode)
