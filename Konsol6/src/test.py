@@ -104,7 +104,7 @@ class TestImageProcessing(unittest.TestCase):
 
     # Uygulmayı konsoldan çağırırken illegal parametrede hata alınıp alınmadığını kontrol et
     def test_script_call_from_command_line_with_illegal_args(self):
-        result = subprocess.run("python Konsol6\src\main.py asdaswd asdasd", shell=True, capture_output=True)
+        result = subprocess.run("python Konsol6\src\main.py asdaswd asdasd asdasd asdasd asdasd asdasd", shell=True, capture_output=True)
         self.assertEqual(result.returncode, 1)
 
 if __name__ == '__main__':
