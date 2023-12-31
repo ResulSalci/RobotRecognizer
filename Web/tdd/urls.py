@@ -21,5 +21,5 @@ from robot_recognize.views import process_image
 
 urlpatterns = [
     path("", home, name="home"),
-    path("process-image", process_image, name="process_image")
+    path("api/process", process_image, name="process_image")
 ]
