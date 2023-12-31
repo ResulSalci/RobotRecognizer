@@ -30,6 +30,15 @@ class TestImageProcessing(unittest.TestCase):
                 resized_image = cv2.resize(image, (802, 600))
                 self.assertEqual(resized_image.shape[:2], (600, 802))
 
+    def test_gaussian_blur(self):
+        for i in range(32):
+            image_path = f'Konsol6/input/{i+1}.jpg'
+            image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+            blurred_image = cv2.GaussianBlur(image, (51, 51), 0)
+
+            self.assertIsNotNone(blurred_image)
+
 
     def test_image_thresholding(self):
         for i in range(32):
@@ -61,12 +70,29 @@ class TestImageProcessing(unittest.TestCase):
 
     def test_output_image_saving(self):
 
-        subprocess.run("python Konsol6\src\main.py 300 1125000 0.40", shell=True, check=True)
+        subprocess.run("python Konsol6\src\main.py 300 1125000 0.40 51 192 193", shell=True, check=True)
        
         for i in range(32):
 
             saved_image = cv2.imread(f'Konsol6/output/{i+1}.jpg')
             self.assertIsNotNone(saved_image)
+
+    def test_script_call_from_command_line_without_params(self):
+        result = subprocess.run("python Konsol6\src\main.py", shell=True, capture_output=True)
+        self.assertEqual(result.returncode, 1)
+
+    def test_script_call_from_command_line_with_illegal_args(self):
+        result = subprocess.run("python Konsol6\src\main.py asdaswd asdasd asdasd asdasd asdasd asd", shell=True, capture_output=True)
+        self.assertEqual(result.returncode, 1)
+
+    def test_gaussian_blur(self):
+        for i in range(32):
+            image_path = f'Konsol6/input/{i+1}.jpg'
+            image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+            blurred_image = cv2.GaussianBlur(image, (51, 51), 0)
+
+            self.assertIsNotNone(blurred_image)
 
 if __name__ == '__main__':
     unittest.main()
