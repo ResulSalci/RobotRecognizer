@@ -3,9 +3,10 @@ import os
 
 def detect_contours(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (19, 19), 0)
+    blurred = cv2.GaussianBlur(gray, (17, 13), 0)
     edges = cv2.Canny(blurred, 40, 130)
     contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
     return contours
 
 def main():
