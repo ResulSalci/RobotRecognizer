@@ -1,3 +1,4 @@
+import sys
 import cv2
 import numpy as np
 import os
@@ -38,59 +39,68 @@ def get_color_from_file(number):
     else:
         return None
 
-image_folder = '/Users/muhammedemincaglar/Documents/GitHub/RobotRecognizer/Konsol2/input'
-output_folder = '/Users/muhammedemincaglar/Documents/GitHub/RobotRecognizer/Konsol2/output'
+if __name__ == "__main__":
+    if len(sys.argv) == 7 or len(sys.argv) == 1:
+        image_folder = '/Users/muhammedemincaglar/Documents/GitHub/RobotRecognizer/Konsol2/input'
+        output_folder = '/Users/muhammedemincaglar/Documents/GitHub/RobotRecognizer/Konsol2/output'
 
-# Klasördeki tüm dosyaları al
-image_files = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f))]
+        # Klasördeki tüm dosyaları al
+        image_files = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f))]
 
-# Her bir görüntü üzerinde işlem yap
-for image_file in image_files:
-    image_path = os.path.join(image_folder, image_file)
-    image = cv2.imread(image_path)
-    height, width, _ = image.shape
-    
-    # (width, height)
-    if height == 4032:
-        image = cv2.resize(image, (600, 802))
-    else:
-        image = cv2.resize(image, (802, 600))
-    
-    file_num = get_number_from_filename(image_file)
-    
-    #RGB'den HSV'ye dönüştürdüm
-    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        # Her bir görüntü üzerinde işlem yap
+        for image_file in image_files:
+            image_path = os.path.join(image_folder, image_file)
+            image = cv2.imread(image_path)
+            height, width, _ = image.shape
+            
+            # (width, height)
+            if height == 4032:
+                image = cv2.resize(image, (600, 802))
+            else:
+                image = cv2.resize(image, (802, 600))
+            
+            file_num = get_number_from_filename(image_file)
+            
+            #RGB'den HSV'ye dönüştürdüm
+            hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-    color_range = get_color_from_file(file_num)
+            color_range = None
+            if len(sys.argv) == 1:
+                color_range = get_color_from_file(file_num)
+            if len(sys.argv) == 7:
+                lower_hue, upper_hue, lower_saturation, upper_saturation, lower_value, upper_value = map(int, sys.argv[1:])
+                color_range = [np.array([lower_hue, lower_saturation, lower_value]),
+                           np.array([upper_hue, upper_saturation, upper_value])]
+            #Color Thresholding
+            color_mask = cv2.inRange(hsv_image, color_range[0], color_range[1])
 
-    #Color Thresholding
-    color_mask = cv2.inRange(hsv_image, color_range[0], color_range[1])
+            #Contour belirliyorum
+            contours, _ = cv2.findContours(color_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    #Contour belirliyorum
-    contours, _ = cv2.findContours(color_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            #Contour alanını filitreliyorum
+            filtered_contours = [cnt for cnt in contours if cv2.contourArea(cnt) > 1000]
 
-    #Contour alanını filitreliyorum
-    filtered_contours = [cnt for cnt in contours if cv2.contourArea(cnt) > 1000]
+            #Her bir robotu işaretle
+            if len(filtered_contours) > 0:
+                for cnt in filtered_contours:  # Her konturu dolaş
+                    M = cv2.moments(cnt)
+                    cx = int(M['m10'] / M['m00'])
+                    cy = int(M['m01'] / M['m00'])
+                    area = cv2.contourArea(cnt)
 
-    #Her bir robotu işaretle
-    if len(filtered_contours) > 0:
-       for cnt in filtered_contours:  # Her konturu dolaş
-        M = cv2.moments(cnt)
-        cx = int(M['m10'] / M['m00'])
-        cy = int(M['m01'] / M['m00'])
-        area = cv2.contourArea(cnt)
+                    cv2.drawContours(image, [cnt], -1, (0, 0, 255), 2)
+                    cv2.putText(image, "Robot", (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+            else:
+                print("Hiç robot bulunamadı.")
 
-        cv2.drawContours(image, [cnt], -1, (0, 0, 255), 2)
-        cv2.putText(image, "Robot", (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-    else:
-        print("Hiç robot bulunamadı.")
+            cv2.imshow(f'Detected Robots - {image_file}', image)
+            result_image_path = os.path.join(output_folder, f'sonuc_{image_file}')
+            cv2.imwrite(result_image_path, image)
 
-    cv2.imshow(f'Detected Robots - {image_file}', image)
-    result_image_path = os.path.join(output_folder, f'sonuc_{image_file}')
-    cv2.imwrite(result_image_path, image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-
+else:
+    print("Usage is: python3 main.py <lower_hue> <upper_hue> <lower_saturation> <upper_saturation> <lower_value> <upper_value>\nUsage is : python3 main.py")
+    sys.exit(1)
 
