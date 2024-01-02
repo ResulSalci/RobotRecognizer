@@ -1,87 +1,51 @@
 import cv2
-import numpy as np
-
-# Resmi yükle
-image = cv2.imread('../input/106.jpg')
-
-# Gri tonlamaya dönüştür
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-# Gürültüyü azaltmak için Gaussian Blur uygula
-blur = cv2.GaussianBlur(gray, (21, 21), 0)
-
-# Kenarları belirleme (Canny Edge Detection)
-edges = cv2.Canny(blur, 20, 25)
-
-# Contour (sınırlar) tespiti
-contours, hierarchy = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-# Konturları resmin üzerine çiz
-cv2.drawContours(image, contours, -1, (0, 255, 0), 5)
-
-# Sonucu göster
-cv2.imshow('Contours', cv2.resize(image,(600,600)))
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-
-
-"""
-import cv2
 import os
+import argparse
 
-def detect_robots(image):
-    # Resmi standartlaştırın
-    image = cv2.resize(image, (640, 480))
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def contour_detection(blurparam1, blurparam2, blurparam3, cannyparam1, cannyparam2):
+    # Görüntülerin bulunduğu klasör yolu
+    input_folder = "../input"
 
-    # Gaussian blur uygulayın
-    blur = cv2.GaussianBlur(image, (5, 5), 1)
+    # İşlenmiş görüntülerin yazılacağı klasör yolu
+    output_folder = "../output"
 
-    # Kenar tespiti uygulayın
-    edges = cv2.Canny(blur, 50, 150)
+    # input_folder içindeki görüntülere tek tek erişme
+    for image_file in os.listdir(input_folder):
 
-    # Konturları bulun
-    contours, hierarchy = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        # Görüntüyü yükle
+        image = cv2.imread(os.path.join(input_folder, image_file))
 
-    # Robotları tespit edin
-    robots = []
-    for contour in contours:
-        # Kontur alanı sınırını kontrol edin
-        if cv2.contourArea(contour) > 200:
-            # Kontur şeklini kontrol edin
-            x, y, w, h = cv2.boundingRect(contour)
-            if w > 50 and h > 50:
-                robots.append(contour)
+        # Gri tonlamaya dönüştür
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    return robots
+        # Gürültüyü azaltmak için Gaussian Blur uygula
+        blur = cv2.GaussianBlur(gray, (blurparam1, blurparam2), blurparam3)
 
-def main():
-    # Input klasörünü açın
-    input_dir = "../input"
-    input_files = os.listdir(input_dir)
+        # Kenarları belirleme (Canny Edge Detection)
+        edges = cv2.Canny(blur, cannyparam1, cannyparam2)
 
-    # Output klasörünü oluşturun
-    output_dir = "../output"
-    if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
+        # Contour (sınırlar) tespiti
+        contours, hierarchy = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Her bir resim için
-    for input_file in input_files:
-        # Resmi yükleyin
-        image = cv2.imread(os.path.join(input_dir, input_file))
+        # Konturları görüntünün üzerine çiz
+        cv2.drawContours(image, contours, -1, (0, 0, 255), 3)
 
-        # Robotları tespit edin
-        robots = detect_robots(image)
+        # İşlenmiş görüntüyü yazdırma
+        cv2.imwrite(os.path.join(output_folder, image_file), image)
 
-        # Robotları çizin
-        for robot in robots:
-            cv2.drawContours(image, [robot], -1, (0, 255, 0), 2)
+if __name__ == '__main__':
+    # Konsoldan önemli parametrelerin alınması (bir değer girilmezse default değerler alınır.)
+    parser = argparse.ArgumentParser(description='Değişkenlik gösteren parametrelerin konsoldan alınması.')
 
-        # Resmi output klasörüne kaydedin
-        output_file = input_file.replace("input", "output")
-        cv2.imwrite(os.path.join(output_dir, output_file), image)
+    parser.add_argument('blurparam1', type=int, default=35, nargs='?')
+    parser.add_argument('blurparam2', type=int, default=35, nargs='?')
+    parser.add_argument('blurparam3', type=int, default=2, nargs='?')
+    parser.add_argument('cannyparam1', type=int, default=25, nargs='?')
+    parser.add_argument('cannyparam2', type=int, default=200, nargs='?')
 
-if __name__ == "__main__":
-    main()
-"""
+    args = parser.parse_args()
+
+    contour_detection(args.blurparam1, args.blurparam2, args.blurparam3, args.cannyparam1, args.cannyparam2)
+
+
+
