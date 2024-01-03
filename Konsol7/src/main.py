@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
-import sys
-
+import argparse
 
 def get_color_from_file(number):
     if(number >= 1 and number <= 2):
@@ -94,8 +93,12 @@ def analyse_images(minArea, maxArea, gaussianBlurKernelSize):
 
 if __name__ == "__main__":
 
-    if len(sys.argv) != 4:
-        print("Usage is: python main.py <minArea> <maxArea> <gaussianBlurKernelSize>")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Analiz Parametleri")
 
-    analyse_images(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]))
+    parser.add_argument("minArea", type=int, default = 1500, nargs="?")
+    parser.add_argument("maxArea", type=int, default = 1125000, nargs="?")
+    parser.add_argument("gaussianBlurKernelSize", type=int, default = 51, nargs="?")
+
+    args = parser.parse_args()
+
+    analyse_images(args.minArea, args.maxArea, args.gaussianBlurKernelSize)
