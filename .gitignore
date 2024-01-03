@@ -1,9 +1,5 @@
-.idea
+*.idea
 
 venv
-
-*.docx
-
-.idea
 
 __pycache__
