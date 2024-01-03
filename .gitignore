@@ -7,5 +7,3 @@ venv
 .idea
 
 __pycache__
-
-**/output/*.jpg
