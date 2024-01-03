@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import sys
+import argparse
 
 def find_robot(image_org, minArea, maxArea, minCircularity, gaussianBlurKernelSize, thresholdMin, thresholdMax):
     
@@ -67,8 +67,16 @@ def analyse_images(minArea, maxArea, minCircularity, gaussianBlurKernelSize, thr
 if __name__ == "__main__":
 
     # minArea = 300, maxArea = 1125000, minCircularity = 0.40, gaussianBlurKernelSize = 51, thresholdMin = 192, thresholdMax = 193
-    if len(sys.argv) != 7:
-        print("Usage is: python main.py <minArea> <maxArea> <minCircularity> <gaussianBlurKernelSize> <thresholdMin> <thresholdMax>")
-        sys.exit(1)
 
-    analyse_images(int(sys.argv[1]), int(sys.argv[2]), float(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]), int(sys.argv[6]))
+    parser = argparse.ArgumentParser(description="Analiz Parametleri")
+
+    parser.add_argument("minArea", type=int, default = 300, nargs="?")
+    parser.add_argument("maxArea", type=int, default = 1125000, nargs="?")
+    parser.add_argument("minCircularity", type=float, default = 0.40, nargs="?")
+    parser.add_argument("gaussianBlurKernelSize", type=int, default = 51, nargs="?")
+    parser.add_argument("thresholdMin", type=int, default = 192, nargs="?")
+    parser.add_argument("thresholdMax", type=int, default = 193, nargs="?")
+
+    args = parser.parse_args()
+
+    analyse_images(args.minArea, args.maxArea, args.minCircularity, args.gaussianBlurKernelSize, args.thresholdMin, args.thresholdMax)

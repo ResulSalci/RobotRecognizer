@@ -109,12 +109,12 @@ class TestImageProcessing(unittest.TestCase):
     # Uygulmayı konsoldan çağırırken eksik parametrede hata alınımp alınmadığını kontrol et
     def test_script_call_from_command_line_without_params(self):
         result = subprocess.run("python Konsol7\src\main.py", shell=True, capture_output=True)
-        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.returncode, 0)
 
     # Uygulmayı konsoldan çağırırken illegal parametrede hata alınıp alınmadığını kontrol et
     def test_script_call_from_command_line_with_illegal_args(self):
         result = subprocess.run("python Konsol7\src\main.py asdaswd asdasd asdas", shell=True, capture_output=True)
-        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.returncode, 2)
 
 
 if __name__ == '__main__':
