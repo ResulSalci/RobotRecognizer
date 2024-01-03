@@ -41,8 +41,8 @@ def get_color_from_file(number):
 
 if __name__ == "__main__":
     if len(sys.argv) == 7 or len(sys.argv) == 1:
-        image_folder = '/Users/muhammedemincaglar/Documents/GitHub/RobotRecognizer/Konsol2/input'
-        output_folder = '/Users/muhammedemincaglar/Documents/GitHub/RobotRecognizer/Konsol2/output'
+        image_folder = '../input'
+        output_folder = '../output'
 
         # Klasördeki tüm dosyaları al
         image_files = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f))]
